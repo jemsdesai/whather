@@ -1,9 +1,17 @@
+import 'dart:developer';
+
+import 'package:exam3/signupDone.dart';
 import 'package:flutter/cupertino.dart';
+
 import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
-class signUp extends StatefulWidget {
 
+import 'login.dart';
+
+class signUp extends StatefulWidget {
+  Database? database;
+  signUp(this.database);
   @override
   State<signUp> createState() => _signUpState();
 }
@@ -16,28 +24,13 @@ class signUp extends StatefulWidget {
 // }
 class _signUpState extends State<signUp> {
   Database? database;
-  @override
+@override
   void initState() {
     // TODO: implement initState
     super.initState();
-    go();
+    database=widget.database;
   }
-  go ()
-  async {
-    // Get a location using getDatabasesPath
-    var databasesPath = await getDatabasesPath();
-    String path = join(databasesPath, 'demo.db');
 
-
-// open the database
-    database = await openDatabase(path, version: 1,
-        onCreate: (Database db, int version) async {
-          // When creating the db, create the table
-          await db.execute(
-              'CREATE TABLE Test (id INTEGER PRIMARY KEY AUTOINCREMENT,name TEXT,number TEXT,email TEXT,password TEXT)');
-        });
-
-  }
   var items = [
     'India',
     'U S A',
@@ -65,11 +58,11 @@ class _signUpState extends State<signUp> {
     String email=email_c.text;
     String password=pass_c.text;
     String qry="insert into Test values(null,'$name','$number','$email','$password')";
-    //   print(qry);
+
 
     int r_id;
     r_id=await database!.rawInsert(qry);
-    print(" row_id= $r_id");
+    log(" row_id= $r_id");
 
   }
   @override
@@ -103,15 +96,15 @@ class _signUpState extends State<signUp> {
         crossAxisAlignment: CrossAxisAlignment.center
         ,children: [
           SizedBox(height: 100,),
-          Center(child: Image(image: AssetImage("img/img.png"),height: 90,width: 90,)),
-          Text("Forcasting",style: TextStyle(fontSize: 18),),
-          SizedBox(height: 30,),
+          Center(child: Image(image: AssetImage("img/img_1.png"),height: 70,width: 150,)),
+          Text("Forcasting",style: TextStyle(fontSize: 18,fontWeight: FontWeight.bold),),
+          SizedBox(height: 20,),
 
           Text("Enter your email address and password",style: TextStyle(fontSize: 17,color: Colors.grey),),
-          SizedBox(height: 50,),
+          SizedBox(height: 30,),
           Container(
             margin: EdgeInsets.only(left: 20,right: 20),
-            padding: EdgeInsets.all(6),
+            padding: EdgeInsets.all(3),
             decoration: BoxDecoration(
               border:Border.all(color: Colors.grey,width: 1)
             ,borderRadius: BorderRadius.circular(14)
@@ -128,7 +121,7 @@ class _signUpState extends State<signUp> {
           ),
           Container(
             margin: EdgeInsets.all(20),
-            padding: EdgeInsets.all(6),
+            padding: EdgeInsets.all(3),
             decoration: BoxDecoration(
               border:Border.all(color: Colors.grey,width: 1)
             ,borderRadius: BorderRadius.circular(14)
@@ -145,7 +138,7 @@ class _signUpState extends State<signUp> {
           ),
 
           Container(
-            padding: EdgeInsets.all(6),
+            padding: EdgeInsets.all(3),
           child:DropdownButtonHideUnderline(
             child: DropdownButton(
              // hint: Text("$city"),
@@ -161,7 +154,7 @@ class _signUpState extends State<signUp> {
             ),
           )
           , margin: EdgeInsets.only(left: 20,right: 20,bottom: 20),
-          height: 63,
+          height: 55,
           width: double.infinity,
             decoration: BoxDecoration(
                 border:Border.all(color: Colors.grey,width: 1)
@@ -171,7 +164,7 @@ class _signUpState extends State<signUp> {
 
           Container(
             margin: EdgeInsets.only(left: 20,right: 20),
-            padding: EdgeInsets.all(6),
+            padding: EdgeInsets.all(3),
             decoration: BoxDecoration(
                 border:Border.all(color: Colors.grey,width: 1)
                 ,borderRadius: BorderRadius.circular(14)
@@ -188,7 +181,7 @@ class _signUpState extends State<signUp> {
           ),
           Container(
             margin: EdgeInsets.all(20),
-            padding: EdgeInsets.all(6),
+            padding: EdgeInsets.all(3),
             decoration: BoxDecoration(
                 border:Border.all(color: Colors.grey,width: 1)
                 ,borderRadius: BorderRadius.circular(14)
@@ -203,21 +196,32 @@ class _signUpState extends State<signUp> {
 
             ),
           ),
-          ElevatedButton(onPressed: () {
-            print("hello");
-          },  child: Text("333")),
+          SizedBox(height: 8),
           ElevatedButton(onPressed: (){
             print("object");
-          //  insertIt();
-                  // name_c.text="";
-                  // num_c.text="";
-                  // email_c.text="";
-                  // pass_c.text="";
-                 // selected="Country";
+       if(isFilled)
+         {
+
+           insertIt();
+             Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
+               log("SignUp done");
+               return signupDone(database);
+             },));
+
+           name_c.text="";
+           num_c.text="";
+           email_c.text="";
+           pass_c.text="";
+         }
+       else
+         {
+           ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Please Fill all Detail")));
+         }
+            //     selected="Country";
           },style: ElevatedButton.styleFrom(primary: Colors.white70,elevation: 0),child: Container(
             child: Center(child: Text("Sign Up",textAlign: TextAlign.center,style: TextStyle(color: Colors.white,fontSize: 25,))),
             width: 350,
-            height: 60,
+            height: 50,
             decoration: (
                 BoxDecoration(
                     borderRadius: BorderRadius.all(Radius.circular(15))
@@ -230,6 +234,23 @@ class _signUpState extends State<signUp> {
                 )
             ),
           )),
+          SizedBox(height: 40),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text("Already have an account ?"),
+              TextButton(
+                  onPressed: () {
+                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
+                      return login(database);
+                    },));
+                  },
+                  child: Text(
+                    "Log In",
+                    style: TextStyle(color: Colors.blue),
+                  ))
+            ],
+          )
           // InkWell(
           //
           //     onTap: (){

@@ -15,7 +15,7 @@ class _splashState extends State<splash> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    redirect();
+   redirect();
 
   }
 
@@ -31,12 +31,16 @@ class _splashState extends State<splash> {
       body: SafeArea(child:Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Center(child: Image(width: 215,height: 91,image: AssetImage("img/img.png")),),
+          Center(child: Image(image: AssetImage("img/img_1.png"),height: 80,width: 160,),),
+          Text("An Innovative Consept",style: TextStyle(//  fontWeight: FontWeight.w800,
+              fontSize: 13
+          ),),
+          SizedBox(height: 8),
           Text("Forcasting",style: TextStyle(color: Color(0xFF4A91FF),
 
 
               fontWeight: FontWeight.w800,
-              fontSize: 45.8182
+              fontSize: 50
           ),)
         ],
       )),
